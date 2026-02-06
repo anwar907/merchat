@@ -1,0 +1,16 @@
+{
+  "name": "merchant-backend",
+  "version": "1.0.0",
+  "description": "Mock backend for Merchant Product Management App",
+  "main": "server.js",
+  "scripts": {
+    "start": "json-server --watch db.json --port 3000",
+    "dev": "json-server --watch db.json --port 3000"
+  },
+  "keywords": ["json-server", "mock-api"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "json-server": "^0.17.4"
+  }
+}
