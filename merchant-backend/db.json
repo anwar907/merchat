@@ -2,12 +2,12 @@
   "products": [
     {
       "id": "1",
-      "name": "Laptop Macbook Pro",
+      "name": "Laptop MackBook",
       "description": "High-performance laptop for professionals",
       "price": 1299.99,
       "stock": 15,
       "imageUrl": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400",
-      "updatedAt": "2026-02-05T22:54:40.017176"
+      "updatedAt": "2026-02-07T09:33:10.115656"
     },
     {
       "id": "2",
@@ -107,6 +107,16 @@
       "createdAt": "2026-02-05T22:57:54.589861",
       "updatedAt": "2026-02-05T22:57:54.589861",
       "id": "hwP1AqF"
+    },
+    {
+      "name": "Sniper",
+      "description": "Sniper ghost warior",
+      "price": 20000,
+      "stock": 2,
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRq8843yVu6YrAgGMCOaREqD7pzVd0Ofbo6hA&s",
+      "createdAt": "2026-02-07T10:44:31.544032",
+      "updatedAt": "2026-02-07T10:44:31.544032",
+      "id": "hEpQOJ7"
     }
   ]
 }

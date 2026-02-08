@@ -35,6 +35,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     on<CreateProductEvent>(_onCreateProduct);
     on<UpdateProductEvent>(_onUpdateProduct);
     on<SyncProducts>(_onSyncProducts);
+    on<LoadMoreProducts>(_onLoadMoreProducts);
 
     // Listen to network changes and trigger sync
     networkInfo.onConnectivityChanged.listen((isConnected) {
@@ -228,6 +229,18 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         add(const LoadProducts(refresh: true));
       },
     );
+  }
+
+  Future<void> _onLoadMoreProducts(
+    LoadMoreProducts event,
+    Emitter<ProductState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is ProductsLoaded &&
+        currentState.hasMore &&
+        !currentState.isLoadingMore) {
+      add(LoadProducts(page: currentState.currentPage + 1));
+    }
   }
 
   String _mapFailureToMessage(Failure failure) {

@@ -16,37 +16,10 @@ class ProductListPage extends StatefulWidget {
 }
 
 class _ProductListPageState extends State<ProductListPage> {
-  final ScrollController _scrollController = ScrollController();
-
   @override
   void initState() {
     super.initState();
     context.read<ProductBloc>().add(const LoadProducts());
-    _scrollController.addListener(_onScroll);
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _onScroll() {
-    if (_isBottom) {
-      final state = context.read<ProductBloc>().state;
-      if (state is ProductsLoaded && state.hasMore && !state.isLoadingMore) {
-        context.read<ProductBloc>().add(
-          LoadProducts(page: state.currentPage + 1),
-        );
-      }
-    }
-  }
-
-  bool get _isBottom {
-    if (!_scrollController.hasClients) return false;
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    final currentScroll = _scrollController.offset;
-    return currentScroll >= (maxScroll * 0.9);
   }
 
   @override
@@ -89,32 +62,44 @@ class _ProductListPageState extends State<ProductListPage> {
           }
 
           if (state is ProductsLoaded) {
-            return RefreshIndicator(
-              onRefresh: () async {
-                context.read<ProductBloc>().add(
-                  const LoadProducts(refresh: true),
-                );
+            return NotificationListener<ScrollNotification>(
+              onNotification: (ScrollNotification scrollInfo) {
+                if (scrollInfo.metrics.pixels >=
+                    scrollInfo.metrics.maxScrollExtent * 0.9) {
+                  context.read<ProductBloc>().add(const LoadMoreProducts());
+                }
+                return false;
               },
-              child: state.products.isEmpty
-                  ? const Center(child: Text('No products available'))
-                  : ListView.builder(
-                      controller: _scrollController,
-                      itemCount:
-                          state.products.length + (state.isLoadingMore ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        if (index >= state.products.length) {
-                          return const Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
-                        }
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  context.read<ProductBloc>().add(
+                    const LoadProducts(refresh: true),
+                  );
+                },
+                child: state.products.isEmpty
+                    ? const Center(child: Text('No products available'))
+                    : ListView.builder(
+                        itemCount:
+                            state.products.length +
+                            (state.isLoadingMore ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          if (index >= state.products.length) {
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+                          }
 
-                        final product = state.products[index];
-                        return _ProductListItem(product: product);
-                      },
-                    ),
+                          final product = state.products[index];
+                          return _ProductListItem(
+                            product: product,
+                            productBloc: context.read<ProductBloc>(),
+                          );
+                        },
+                      ),
+              ),
             );
           }
 
@@ -154,12 +139,8 @@ class _ProductListPageState extends State<ProductListPage> {
             MaterialPageRoute(builder: (context) => const ProductFormPage()),
           );
 
-          if (result == true && mounted) {
-            if (context.mounted) {
-              context.read<ProductBloc>().add(
-                const LoadProducts(refresh: true),
-              );
-            }
+          if (result == true && context.mounted) {
+            context.read<ProductBloc>().add(const LoadProducts(refresh: true));
           }
         },
         child: const Icon(Icons.add),
@@ -170,8 +151,9 @@ class _ProductListPageState extends State<ProductListPage> {
 
 class _ProductListItem extends StatelessWidget {
   final Product product;
+  final ProductBloc productBloc;
 
-  const _ProductListItem({required this.product});
+  const _ProductListItem({required this.product, required this.productBloc});
 
   @override
   Widget build(BuildContext context) {
@@ -229,8 +211,8 @@ class _ProductListItem extends StatelessWidget {
             ),
           );
 
-          if (result == true && context.mounted) {
-            context.read<ProductBloc>().add(const LoadProducts(refresh: true));
+          if (result == true) {
+            productBloc.add(const LoadProducts(refresh: true));
           }
         },
       ),

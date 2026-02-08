@@ -69,3 +69,7 @@ class UpdateProductEvent extends ProductEvent {
 class SyncProducts extends ProductEvent {
   const SyncProducts();
 }
+
+class LoadMoreProducts extends ProductEvent {
+  const LoadMoreProducts();
+}
